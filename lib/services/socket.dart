@@ -12,8 +12,8 @@ class SocketService {
     );
   }
 
-  void connect() {
-    _socket.connect();
+  void connectIfNot() {
+    if (_socket.disconnected) _socket.connect();
   }
 
   void on(String event, Function(dynamic) handler) {

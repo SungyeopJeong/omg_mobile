@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:screen_badminton_mobile/viewmodels/room_model.dart';
+import 'package:screen_badminton_mobile/viewmodels/game_model.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -36,9 +36,9 @@ class _HomeViewState extends State<HomeView> {
           TextField(controller: _codeController),
           OutlinedButton(
             onPressed: () {
-              final viewModel = context.read<RoomModel>();
-              viewModel.connect();
-              viewModel.input(_codeController.text);
+              final viewModel = context.read<GameModel>();
+              viewModel.connectIfNot();
+              viewModel.setUser(_nameController.text, _codeController.text);
               viewModel.join();
             },
             child: const Text('JOIN'),
