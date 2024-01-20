@@ -27,4 +27,11 @@ class RoomModel extends ChangeNotifier {
       notifyListeners();
     });
   }
+
+  void exit() {
+    _socketService.off('ready $_code');
+    _code = null;
+    joined = false;
+    notifyListeners();
+  }
 }
