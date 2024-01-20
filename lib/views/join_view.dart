@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:screen_badminton_mobile/viewmodels/room_model.dart';
+import 'package:screen_badminton_mobile/viewmodels/game_model.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 class JoinView extends StatefulWidget {
@@ -42,7 +42,7 @@ class _JoinViewState extends State<JoinView> {
         actions: [
           IconButton(
             onPressed: () {
-              context.read<RoomModel>().exit();
+              context.read<GameModel>().exit();
             },
             icon: const Icon(
               Icons.exit_to_app,
@@ -183,6 +183,7 @@ class _JoinViewState extends State<JoinView> {
   @override
   void initState() {
     super.initState();
+    final sensor = context.read<GameModel>().sensor;
     _streamSubscriptions.add(
       userAccelerometerEventStream(samplingPeriod: sensorInterval).listen(
         (UserAccelerometerEvent event) {
@@ -197,6 +198,13 @@ class _JoinViewState extends State<JoinView> {
             }
           });
           _userAccelerometerUpdateTime = now;
+          sensor.accX = _userAccelerometerEvent?.x ?? 0;
+          sensor.accY = _userAccelerometerEvent?.y ?? 0;
+          sensor.accZ = _userAccelerometerEvent?.z ?? 0;
+          sensor.accT = _userAccelerometerLastInterval?.toDouble() ?? 0;
+          if (context.read<GameModel>().requested) {
+            context.read<GameModel>().send();
+          }
         },
         onError: (e) {
           showDialog(
@@ -255,6 +263,13 @@ class _JoinViewState extends State<JoinView> {
             }
           });
           _gyroscopeUpdateTime = now;
+          sensor.gyrX = _gyroscopeEvent?.x ?? 0;
+          sensor.gyrY = _gyroscopeEvent?.y ?? 0;
+          sensor.gyrZ = _gyroscopeEvent?.z ?? 0;
+          sensor.gyrT = _gyroscopeLastInterval?.toDouble() ?? 0;
+          if (context.read<GameModel>().requested) {
+            context.read<GameModel>().send();
+          }
         },
         onError: (e) {
           showDialog(
