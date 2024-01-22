@@ -64,7 +64,12 @@ class GameModel extends ChangeNotifier {
   }
 
   void send() {
-    _socketService.emit('send', {'code': user?.code}..addAll(sensor.toJson()));
+    _socketService.emit(
+        'send',
+        {
+          'name': user?.name,
+          'code': user?.code,
+        }..addAll(sensor.toJson()));
   }
 
   void exit() {
