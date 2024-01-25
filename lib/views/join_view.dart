@@ -16,19 +16,13 @@ class _JoinViewState extends State<JoinView> {
   static const Duration _ignoreDuration = Duration(milliseconds: 20);
 
   UserAccelerometerEvent? _userAccelerometerEvent;
-  AccelerometerEvent? _accelerometerEvent;
   GyroscopeEvent? _gyroscopeEvent;
-  MagnetometerEvent? _magnetometerEvent;
 
   DateTime? _userAccelerometerUpdateTime;
-  DateTime? _accelerometerUpdateTime;
   DateTime? _gyroscopeUpdateTime;
-  DateTime? _magnetometerUpdateTime;
 
   int? _userAccelerometerLastInterval;
-  int? _accelerometerLastInterval;
   int? _gyroscopeLastInterval;
-  int? _magnetometerLastInterval;
   final _streamSubscriptions = <StreamSubscription<dynamic>>[];
 
   Duration sensorInterval = SensorInterval.normalInterval;
@@ -37,7 +31,7 @@ class _JoinViewState extends State<JoinView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sensors Plus Example'),
+        title: Text(context.read<GameModel>().user?.name ?? ''),
         elevation: 4,
         actions: [
           IconButton(
@@ -87,36 +81,12 @@ class _JoinViewState extends State<JoinView> {
                   children: [
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text('Accelerometer'),
-                    ),
-                    Text(_accelerometerEvent?.x.toStringAsFixed(1) ?? '?'),
-                    Text(_accelerometerEvent?.y.toStringAsFixed(1) ?? '?'),
-                    Text(_accelerometerEvent?.z.toStringAsFixed(1) ?? '?'),
-                    Text('${_accelerometerLastInterval?.toString() ?? '?'} ms'),
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Text('Gyroscope'),
                     ),
                     Text(_gyroscopeEvent?.x.toStringAsFixed(1) ?? '?'),
                     Text(_gyroscopeEvent?.y.toStringAsFixed(1) ?? '?'),
                     Text(_gyroscopeEvent?.z.toStringAsFixed(1) ?? '?'),
                     Text('${_gyroscopeLastInterval?.toString() ?? '?'} ms'),
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text('Magnetometer'),
-                    ),
-                    Text(_magnetometerEvent?.x.toStringAsFixed(1) ?? '?'),
-                    Text(_magnetometerEvent?.y.toStringAsFixed(1) ?? '?'),
-                    Text(_magnetometerEvent?.z.toStringAsFixed(1) ?? '?'),
-                    Text('${_magnetometerLastInterval?.toString() ?? '?'} ms'),
                   ],
                 ),
               ],
@@ -221,35 +191,6 @@ class _JoinViewState extends State<JoinView> {
       ),
     );
     _streamSubscriptions.add(
-      accelerometerEventStream(samplingPeriod: sensorInterval).listen(
-        (AccelerometerEvent event) {
-          final now = DateTime.now();
-          setState(() {
-            _accelerometerEvent = event;
-            if (_accelerometerUpdateTime != null) {
-              final interval = now.difference(_accelerometerUpdateTime!);
-              if (interval > _ignoreDuration) {
-                _accelerometerLastInterval = interval.inMilliseconds;
-              }
-            }
-          });
-          _accelerometerUpdateTime = now;
-        },
-        onError: (e) {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return const AlertDialog(
-                  title: Text("Sensor Not Found"),
-                  content: Text(
-                      "It seems that your device doesn't support Accelerometer Sensor"),
-                );
-              });
-        },
-        cancelOnError: true,
-      ),
-    );
-    _streamSubscriptions.add(
       gyroscopeEventStream(samplingPeriod: sensorInterval).listen(
         (GyroscopeEvent event) {
           final now = DateTime.now();
@@ -279,35 +220,6 @@ class _JoinViewState extends State<JoinView> {
                   title: Text("Sensor Not Found"),
                   content: Text(
                       "It seems that your device doesn't support Gyroscope Sensor"),
-                );
-              });
-        },
-        cancelOnError: true,
-      ),
-    );
-    _streamSubscriptions.add(
-      magnetometerEventStream(samplingPeriod: sensorInterval).listen(
-        (MagnetometerEvent event) {
-          final now = DateTime.now();
-          setState(() {
-            _magnetometerEvent = event;
-            if (_magnetometerUpdateTime != null) {
-              final interval = now.difference(_magnetometerUpdateTime!);
-              if (interval > _ignoreDuration) {
-                _magnetometerLastInterval = interval.inMilliseconds;
-              }
-            }
-          });
-          _magnetometerUpdateTime = now;
-        },
-        onError: (e) {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return const AlertDialog(
-                  title: Text("Sensor Not Found"),
-                  content: Text(
-                      "It seems that your device doesn't support Magnetometer Sensor"),
                 );
               });
         },
